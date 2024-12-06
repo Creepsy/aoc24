@@ -44,8 +44,8 @@ impl Direction {
 fn main() {
     let file = std::env::args().nth(1).expect("No input file given");
     let input = std::fs::read_to_string(file).unwrap();
-    let (grid, guard) = parse(&input).expect("Invalid input format");
-    println!("Part 1: {}", part1(grid.clone(), guard));
+    let (mut grid, guard) = parse(&input).expect("Invalid input format");
+    println!("Part 1: {}", part1(&mut grid, guard));
     println!("Part 2: {}", part2(grid, guard));
 }
 
@@ -76,9 +76,9 @@ fn parse(input: &str) -> Result<(Vec<Vec<State>>, Guard), &str> {
     Ok((grid, guard?))
 }
 
-fn part1(mut grid: Vec<Vec<State>>, mut guard: Guard) -> usize {
+fn part1(grid: &mut Vec<Vec<State>>, mut guard: Guard) -> usize {
     loop {
-        let guard_new = step(&mut grid, guard);
+        let guard_new = step(grid, guard);
         if guard_new.is_none() {
             break;
         }
@@ -91,7 +91,7 @@ fn part2(grid: Vec<Vec<State>>, guard@(init_pos, _): Guard) -> usize {
     let mut placements = 0;
     for y in 0..grid.len() {
         for x in 0..grid[y].len() {
-            if grid[y][x] == State::Blank && init_pos != (y, x) {
+            if grid[y][x] == State::Visited && init_pos != (y, x) {
                 let mut grid_s = grid.clone();
                 grid_s[y][x] = State::Blocked;
                 placements += loops(grid_s, guard) as usize;
